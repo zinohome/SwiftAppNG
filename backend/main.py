@@ -13,6 +13,8 @@ from starlette.staticfiles import StaticFiles
 
 from core import settings
 from core.globals import auth, site
+from contextlib import asynccontextmanager
+
 
 app = FastAPI(debug=settings.debug)
 # 在app应用下每条请求处理之前都附加`request.auth`和`request.user`对象
@@ -36,6 +38,7 @@ site.mount_app(app)
 #     async_db.session.get(...)
 #     # do something
 
+
 @app.on_event("startup")
 async def startup():
     await site.db.async_run_sync(SQLModel.metadata.create_all, is_session=False)
@@ -47,7 +50,6 @@ async def startup():
     await site.router.startup()
     if not auth.enforcer.enforce("u:admin", site.unique_id, "page", "page"):
         await auth.enforcer.add_policy("u:admin", site.unique_id, "page", "page", "allow")
-
 
 @app.get('/')
 async def index():
@@ -90,7 +92,7 @@ async def custom_redoc_ui_html():
     return get_redoc_html(
         openapi_url=app.openapi_url,
         title=f"{app.title} - ReDoc",
-        redoc_js_url="/static/redoc@next/redoc.standalone.js",
+        redoc_js_url="/static/redoc@next/bundles/redoc.standalone.js",
         redoc_favicon_url="/static/favicon.png",
         with_google_fonts=False,
     )

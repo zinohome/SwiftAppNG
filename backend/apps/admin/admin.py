@@ -12,7 +12,7 @@ from utils.modelchecker import Modelchecker
 
 # 更新系统库文件
 mc = Modelchecker()
-#mc.check_models()
+mc.check_models()
 from core.globals import site
 from construct.app import App
 from utils.log import log as log
